@@ -1,0 +1,37 @@
+syntax = "proto3";
+
+package model;
+option go_package="./model";
+
+import "google/protobuf/timestamp.proto";
+
+message CrimeData {
+    int32 report_number = 1;
+    google.protobuf.Timestamp date_reported = 2;
+    google.protobuf.Timestamp date_occurred = 3;
+    string time_occurred = 4;
+    string area = 5;
+    string area_name = 6;
+    string report_district_number = 7;
+    int32 part_1_2 = 8;
+    int32 crime_code = 9;
+    string crime_code_description = 10;
+    string mocodes = 11;
+    int32 victim_age = 12;
+    string victim_sex = 13;
+    string victim_descent = 14;
+    int32 premise_code = 15;
+    string premise_description = 16;
+    int32 weapon_used_code = 17;
+    string weapon_description = 18;
+    string status = 19;
+    string status_description = 20;
+    int32 crime_code_1 = 21;
+    int32 crime_code_2 = 22;
+    int32 crime_code_3 = 23;
+    int32 crime_code_4 = 24;
+    string location = 25;
+    string cross_street = 26;
+    double latitude = 27;
+    double longitude = 28;
+}

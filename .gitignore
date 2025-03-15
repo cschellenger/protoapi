@@ -1,0 +1,6 @@
+protoapi
+.vscode/
+*~
+\#*\#
+*.csv
+*.db
