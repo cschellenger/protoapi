@@ -9,3 +9,6 @@ gobuild: protoapi
 
 protoapi:
 	go build .
+
+test:
+	go test -v ./...

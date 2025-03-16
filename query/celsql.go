@@ -2,6 +2,7 @@ package query
 
 import (
 	"fmt"
+	"time"
 
 	"darkport.net/protoapi/model"
 	"github.com/google/cel-go/cel"
@@ -89,6 +90,17 @@ func (s *SqlQueryBuilder) RenderExpr(expression *exprpb.Expr, args []any) (strin
 }
 
 func (s *SqlQueryBuilder) RenderCall(call *exprpb.Expr_Call, args []any) (string, []any, error) {
+	// handle special case of timestamp function
+	if call.Function == "timestamp" {
+		arg := call.Args[0]
+		time, err := time.Parse(time.RFC3339, arg.GetConstExpr().GetStringValue())
+		if err != nil {
+			return "", args, err
+		}
+		args = append(args, time)
+		return "?", args, nil
+	}
+	// handle other functions with 2 args
 	lhs := call.Args[0]
 	lhs_string, args, err := s.RenderExpr(lhs, args)
 	if err != nil {

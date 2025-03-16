@@ -2,6 +2,7 @@ package query
 
 import (
 	"testing"
+	"time"
 
 	"darkport.net/protoapi/model"
 )
@@ -38,6 +39,30 @@ func TestRenderQuery(t *testing.T) {
 		t.Errorf("Expected %s, got %s", resultExpected, result)
 	}
 	argsExpected := []any{"AA", int64(18)}
+	if len(args) != len(argsExpected) {
+		t.Errorf("Expected %v, got %v", argsExpected, args)
+	}
+	for i := range args {
+		if args[i] != argsExpected[i] {
+			t.Errorf("Expected %v, got %v", argsExpected[i], args[i])
+		}
+	}
+}
+
+func TestTimeComparison(t *testing.T) {
+	s := &SqlQueryBuilder{
+		Table:     "la_crime",
+		Prototype: (&model.CrimeData{}).ProtoReflect(),
+	}
+	result, args, err := s.BuildQuery(&model.SearchRequest{Query: "record.date_reported > timestamp('2021-01-01T00:00:00Z')"})
+	if err != nil {
+		panic(err)
+	}
+	resultExpected := "SELECT * FROM la_crime WHERE date_reported > ? LIMIT 10"
+	if result != resultExpected {
+		t.Errorf("Expected %s, got %s", resultExpected, result)
+	}
+	argsExpected := []any{time.Date(2021, 1, 1, 0, 0, 0, 0, time.UTC)}
 	if len(args) != len(argsExpected) {
 		t.Errorf("Expected %v, got %v", argsExpected, args)
 	}
