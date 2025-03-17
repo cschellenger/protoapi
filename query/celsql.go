@@ -43,7 +43,44 @@ func (s *SqlQueryBuilder) BuildQuery(searchRequest *model.SearchRequest) (string
 	if where != "" {
 		where = " WHERE " + where
 	}
-	return queryBase + where + " LIMIT 10", args, nil
+	sort, err := s.RenderSort(searchRequest)
+	if err != nil {
+		return "", args, err
+	}
+	limit := s.RenderLimitAndOffset(searchRequest)
+	return queryBase + where + sort + limit, args, nil
+}
+
+func (s *SqlQueryBuilder) RenderSort(searchRequest *model.SearchRequest) (string, error) {
+	if searchRequest.Sort == "" {
+		return "", nil
+	}
+	validName := s.Prototype.Descriptor().Fields().ByName(protoreflect.Name(searchRequest.Sort))
+	if validName == nil {
+		return "", fmt.Errorf("invalid sort field: %s", searchRequest.Sort)
+	}
+	order := "ASC"
+	switch searchRequest.Order {
+	case model.SortOrder_ASC:
+		order = "ASC"
+	case model.SortOrder_DESC:
+		order = "DESC"
+	default:
+		return "", fmt.Errorf("invalid sort order: %v", searchRequest.Order)
+	}
+	return fmt.Sprintf(" ORDER BY %s %s", validName.Name(), order), nil
+}
+
+func (s *SqlQueryBuilder) RenderLimitAndOffset(searchRequest *model.SearchRequest) string {
+	limit := searchRequest.Size
+	if searchRequest.Size == 0 {
+		limit = 10
+	}
+	offset := ""
+	if searchRequest.Offset > 0 {
+		offset = fmt.Sprintf(" OFFSET %d", searchRequest.Offset)
+	}
+	return fmt.Sprintf(" LIMIT %d%s", limit, offset)
 }
 
 func (s *SqlQueryBuilder) RenderExpr(expression *exprpb.Expr, args []any) (string, []any, error) {

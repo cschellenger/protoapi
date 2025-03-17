@@ -25,7 +25,7 @@ func TestRenderEmpty(t *testing.T) {
 	}
 }
 
-func TestRenderQuery(t *testing.T) {
+func TestRenderCompoundQuery(t *testing.T) {
 	s := &SqlQueryBuilder{
 		Table:     "la_crime",
 		Prototype: (&model.CrimeData{}).ProtoReflect(),
@@ -63,6 +63,78 @@ func TestTimeComparison(t *testing.T) {
 		t.Errorf("Expected %s, got %s", resultExpected, result)
 	}
 	argsExpected := []any{time.Date(2021, 1, 1, 0, 0, 0, 0, time.UTC)}
+	if len(args) != len(argsExpected) {
+		t.Errorf("Expected %v, got %v", argsExpected, args)
+	}
+	for i := range args {
+		if args[i] != argsExpected[i] {
+			t.Errorf("Expected %v, got %v", argsExpected[i], args[i])
+		}
+	}
+}
+
+func TestSize(t *testing.T) {
+	s := &SqlQueryBuilder{
+		Table:     "la_crime",
+		Prototype: (&model.CrimeData{}).ProtoReflect(),
+	}
+	result, args, err := s.BuildQuery(&model.SearchRequest{Query: "record.status == 'AA'", Size: 15})
+	if err != nil {
+		panic(err)
+	}
+	resultExpected := "SELECT * FROM la_crime WHERE status = ? LIMIT 15"
+	if result != resultExpected {
+		t.Errorf("Expected %s, got %s", resultExpected, result)
+	}
+	argsExpected := []any{"AA"}
+	if len(args) != len(argsExpected) {
+		t.Errorf("Expected %v, got %v", argsExpected, args)
+	}
+	for i := range args {
+		if args[i] != argsExpected[i] {
+			t.Errorf("Expected %v, got %v", argsExpected[i], args[i])
+		}
+	}
+}
+
+func TestSizeAndOffset(t *testing.T) {
+	s := &SqlQueryBuilder{
+		Table:     "la_crime",
+		Prototype: (&model.CrimeData{}).ProtoReflect(),
+	}
+	result, args, err := s.BuildQuery(&model.SearchRequest{Query: "record.status == 'AA'", Size: 15, Offset: 5})
+	if err != nil {
+		panic(err)
+	}
+	resultExpected := "SELECT * FROM la_crime WHERE status = ? LIMIT 15 OFFSET 5"
+	if result != resultExpected {
+		t.Errorf("Expected %s, got %s", resultExpected, result)
+	}
+	argsExpected := []any{"AA"}
+	if len(args) != len(argsExpected) {
+		t.Errorf("Expected %v, got %v", argsExpected, args)
+	}
+	for i := range args {
+		if args[i] != argsExpected[i] {
+			t.Errorf("Expected %v, got %v", argsExpected[i], args[i])
+		}
+	}
+}
+
+func TestSortOrder(t *testing.T) {
+	s := &SqlQueryBuilder{
+		Table:     "la_crime",
+		Prototype: (&model.CrimeData{}).ProtoReflect(),
+	}
+	result, args, err := s.BuildQuery(&model.SearchRequest{Query: "record.status == 'AA'", Order: model.SortOrder_DESC, Sort: "date_reported"})
+	if err != nil {
+		panic(err)
+	}
+	resultExpected := "SELECT * FROM la_crime WHERE status = ? ORDER BY date_reported DESC LIMIT 10"
+	if result != resultExpected {
+		t.Errorf("Expected %s, got %s", resultExpected, result)
+	}
+	argsExpected := []any{"AA"}
 	if len(args) != len(argsExpected) {
 		t.Errorf("Expected %v, got %v", argsExpected, args)
 	}
