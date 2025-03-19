@@ -2,5 +2,4 @@ protoapi
 .vscode/
 *~
 \#*\#
-*.csv
 *.db

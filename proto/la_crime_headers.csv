@@ -1,0 +1,1 @@
+report_number,date_reported,date_occurred,time_occurred,area,area_name,report_district_number,part_1_2,crime_code,crime_code_description,mocodes,victim_age,victim_sex,victim_descent,premise_code,premise_description,weapon_used_code,weapon_description,status,status_description,crime_code_1,crime_code_2,crime_code_3,crime_code_4,location,cross_street,latitude,longitude
